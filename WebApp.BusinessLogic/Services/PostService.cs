@@ -114,6 +114,12 @@ namespace WebApp.BusinessLogic.Services
         public async Task<PostModel> UpdatePostAsync(int postId, string userId, PostCreateModel postModel)
         {
             LogInformation(this.logger, $"Updating post with ID: {postId}", null);
+
+            if (string.IsNullOrWhiteSpace(postModel?.Content))
+            {
+                throw new AppException("Post content cannot be empty.");
+            }
+
             var existingPost = await this.postRepository.GetByIdAsync(postId);
             if (existingPost == null)
             {
@@ -121,15 +127,17 @@ namespace WebApp.BusinessLogic.Services
                 throw new AppException($"Post with ID {postId} not found.");
             }
 
-            var updatedPost = this.mapper.Map(postModel, existingPost);
-            ValidatePost(updatedPost);
+            _ = this.mapper.Map(postModel, existingPost); // Map postModel properties to existingPost
+            ValidatePost(existingPost);
 
-            updatedPost.Id = postId;
-            updatedPost.UserId = userId;
+            existingPost.Id = postId;
+            existingPost.UserId = userId;
 
             _ = await this.postRepository.UpdateAsync(existingPost);
+
             LogInformation(this.logger, $"Post with ID: {postId} updated.", null);
-            return this.mapper.Map<PostModel>(updatedPost);
+
+            return this.mapper.Map<PostModel>(existingPost);
         }
 
         /// <summary>
@@ -214,15 +222,24 @@ namespace WebApp.BusinessLogic.Services
                 throw new AppException($"Reply with ID {replyId} not found.");
             }
 
-            var updatedReply = this.mapper.Map(replyModel, existingReply);
-            ValidateReply(updatedReply);
+            if (string.IsNullOrWhiteSpace(replyModel?.Content))
+            {
+                throw new AppException("Reply content cannot be empty.");
+            }
 
-            updatedReply.Id = replyId;
-            updatedReply.UserId = userId;
+            // Map properties from replyModel to existingReply
+            _ = this.mapper.Map(replyModel, existingReply);
 
-            _ = await this.postReplyRepository.UpdateAsync(updatedReply);
+            ValidateReply(existingReply);
+
+            existingReply.Id = replyId;
+            existingReply.UserId = userId;
+
+            _ = await this.postReplyRepository.UpdateAsync(existingReply);
+
             LogInformation(this.logger, $"Reply with ID: {replyId} updated.", null);
-            return this.mapper.Map<PostReplyModel>(updatedReply);
+
+            return this.mapper.Map<PostReplyModel>(existingReply);
         }
 
         /// <summary>

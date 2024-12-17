@@ -80,14 +80,13 @@ namespace WebApp.BusinessLogic.Services
                 return (0, "User is empty");
             }
 
-            var userExists = await this.userManager.FindByNameAsync(model.Username);
+            var userExists = await this.userManager.FindByNameAsync(model.UserName);
             if (userExists != null)
             {
-                LogWarning(this.logger, $"User registration failed: User '{model.Username}' already exists.", null);
+                LogWarning(this.logger, $"User registration failed: User '{model.UserName}' already exists.", null);
                 return (0, "User with this name already exists");
             }
 
-            // Use AutoMapper to map RegistrationModel to ApplicationUser
             ApplicationUser user = this.mapper.Map<ApplicationUser>(model);
 
             var createUserResult = await this.userManager.CreateAsync(user, model.Password);
@@ -103,7 +102,7 @@ namespace WebApp.BusinessLogic.Services
             }
 
             _ = await this.userManager.AddToRoleAsync(user, role);
-            LogInformation(this.logger, $"User '{model.Username}' created successfully and assigned to role '{role}'.", null);
+            LogInformation(this.logger, $"User '{model.UserName}' created successfully and assigned to role '{role}'.", null);
             return (1, "User created successfully!");
         }
 
@@ -120,16 +119,16 @@ namespace WebApp.BusinessLogic.Services
                 return (0, "User is empty", null);
             }
 
-            var user = await this.userManager.FindByNameAsync(model.Username);
+            var user = await this.userManager.FindByNameAsync(model.UserName);
             if (user == null)
             {
-                LogWarning(this.logger, $"Login failed: No such username '{model.Username}'.", null);
+                LogWarning(this.logger, $"Login failed: No such username '{model.UserName}'.", null);
                 return (0, "No such username", null);
             }
 
             if (!await this.userManager.CheckPasswordAsync(user, model.Password))
             {
-                LogWarning(this.logger, $"Login failed for user '{model.Username}': Invalid password.", null);
+                LogWarning(this.logger, $"Login failed for user '{model.UserName}': Invalid password.", null);
                 return (0, "Invalid password", null);
             }
 
@@ -147,8 +146,8 @@ namespace WebApp.BusinessLogic.Services
             }
 
             string token = this.GenerateToken(authClaims);
-            LogInformation(this.logger, $"User '{model.Username}' logged in successfully.", null);
-            return (1, token, model.Username);
+            LogInformation(this.logger, $"User '{model.UserName}' logged in successfully.", null);
+            return (1, token, model.UserName);
         }
 
         /// <summary>
@@ -158,9 +157,7 @@ namespace WebApp.BusinessLogic.Services
         /// <returns>The generated JWT token as a string.</returns>
         private string GenerateToken(IEnumerable<Claim> claims)
         {
-#pragma warning disable S6781 // JWT secret keys should not be disclosed
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.configuration["JWT:Secret"]));
-#pragma warning restore S6781 // JWT secret keys should not be disclosed
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

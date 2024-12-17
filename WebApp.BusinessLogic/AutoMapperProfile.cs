@@ -16,7 +16,11 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.User, opt => opt.Ignore())
             .ForMember(dest => dest.Thread, opt => opt.Ignore());
 
-        _ = this.CreateMap<Post, PostCreateModel>().ReverseMap();
+        _ = this.CreateMap<Post, PostCreateModel>();
+
+        _ = this.CreateMap<PostCreateModel, Post>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.UserId, opt => opt.Ignore());
 
         _ = this.CreateMap<PostReply, PostReplyModel>()
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User != null ? src.User.UserName : null))
@@ -24,7 +28,11 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.User, opt => opt.Ignore())
             .ForMember(dest => dest.Post, opt => opt.Ignore());
 
-        _ = this.CreateMap<PostReply, PostReplyCreateModel>().ReverseMap();
+        _ = this.CreateMap<PostReply, PostReplyCreateModel>();
+
+        _ = this.CreateMap<PostReplyCreateModel, PostReply>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.UserId, opt => opt.Ignore());
 
         _ = this.CreateMap<ForumThread, ForumThreadModel>()
             .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User != null ? src.User.UserName : null))
@@ -37,5 +45,7 @@ public class AutoMapperProfile : Profile
         _ = this.CreateMap<ApplicationUser, LoginModel>().ReverseMap();
 
         _ = this.CreateMap<ApplicationUser, RegistrationModel>().ReverseMap();
+
+        _ = this.CreateMap<ApplicationUser, UserModel>().ReverseMap();
     }
 }

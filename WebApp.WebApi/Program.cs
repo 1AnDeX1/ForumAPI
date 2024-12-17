@@ -53,10 +53,12 @@ builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 builder.Services.AddScoped<IForumThreadRepository, ForumThreadRepository>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostReplyRepository, PostReplyRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<IForumThreadService, ForumThreadService>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 

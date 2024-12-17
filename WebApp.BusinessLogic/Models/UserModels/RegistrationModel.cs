@@ -4,7 +4,7 @@ namespace WebApp.BusinessLogic.Models.UserModels;
 public class RegistrationModel
 {
     [Required(ErrorMessage = "User Name is required")]
-    public string? Username { get; set; }
+    public string? UserName { get; set; }
 
     [Required(ErrorMessage = "Email is required")]
     [EmailAddress(ErrorMessage = "Invalid email address format")]
